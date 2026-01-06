@@ -1,5 +1,7 @@
 # importing necessary libraries
 # subprocess to implement John the Ripper
+# import cmd
+import cmd
 import subprocess
 # to create MD5 hashes
 import hashlib
@@ -66,7 +68,49 @@ def password_hash(password):
         print(f"ValueError: {V}")
     # Else statement to have it run with subprocess if correct
     else:
-        return hash_sha256
+        # send to hashfile.txt for John the Ripper
+        with open("hashfile.txt","w") as f:
+            f.write(hash_sha256 + "\n")
+            return hash_sha256
+# Function for the dict attack
+def JTR_dict():
+    print("Starting Dictionary Attack")
+    # Get the directories where this script is location
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    hashfile_path = os.path.join(script_dir, "hashfile.txt")
+    wordlist_path = os.path.join(script_dir, "rockyou.txt")
+    john_path = os.path.join(script_dir, "john", "run", "john")
+
+    # ensure the required files exist
+     # Check if required files exist
+    if not os.path.exists(hashfile_path):
+        print("Error: hashfile.txt not found!")
+        return 0
+        
+    if not os.path.exists(wordlist_path):
+        print("Error: rockyou.txt wordlist not found!")
+        return 0
+        
+    if not os.path.exists(john_path):
+        print("Error: John the Ripper binary not found!")
+        return 0
+    return 0
+# Function for Brute Force attack
+    start_time = time.time()
+
+    # try statement in order to start the attack,so that error doesnt crash program 
+    try:
+        # Using subprocess.run
+        # placeholder to let base run
+        print ("hi")
+        # placeholder
+        # dict_result = subprocess.run
+    finally:
+        return 0 
+
+def JTR_Brute():
+    return 0
+# Menu function for each option
 def menu():
     while True:
         print ("Password Strength Test")
@@ -96,10 +140,9 @@ def menu():
         print("Brute Force Attacks are more in depth and take longer, for this program it will instead be a estimate of how long it would take to crack")
         print("="*40)
         print("type EXIT to leave prompt at any time")
-        str(input(f"Please enter below which attack you would like done {1} Dictionary Attack {2} Brute Force"))
-        # rest is either attack and a exit function
+        JTR = str(input(f"Please enter below which attack you would like done {1} Dictionary Attack {2} Brute Force"))
+        # Rest is either attack function and a exit for the program # do it after
         
-
 if __name__ == "__main__":
     menu()
 
