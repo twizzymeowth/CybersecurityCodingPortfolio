@@ -75,14 +75,14 @@ def password_hash(password):
             return hash_sha256
 # Function for the dict attack
 def JTR_dict():
-    print("Starting Dictionary Attack")
+    print("Starting Dictionary Attack with Rules (Enhanced)")
     # Get the directories where this script is located
     script_dir = os.path.dirname(os.path.abspath(__file__))
     hashfile_path = os.path.join(script_dir, "hashfile.txt")
     wordlist_path = os.path.join(script_dir, "rockyou.txt")
     john_path = os.path.join(script_dir, "john", "run", "john")
-    
-    # Check if required files exist
+    john_conf = os.path.join(script_dir, "john", "run", "john.conf")
+    # Testing to check the paths work before testing
     if not os.path.exists(hashfile_path):
         print("Error: hashfile.txt not found!")
         return 0
@@ -95,6 +95,37 @@ def JTR_dict():
         print("Error: John the Ripper binary not found!")
         return 0
     
+    # Clear any previous session
+    pot_file = os.path.join(script_dir, "john", "run", "john.pot")
+    if os.path.exists(pot_file):
+        os.remove(pot_file)
+    
+    try:
+        # Using --rules=Wordlist applies common transformations:
+        # - Adding numbers (0-9, 00-99)
+        # - Adding symbols (!@#$%^&*)
+        # - Capitalizing first letter
+        # - l33t speak substitutions
+        # This catches passwords like "Password9!" from base word "password"
+        result = subprocess.run(
+            [john_path, f"--wordlist={wordlist_path}", "--rules=Wordlist", "--format=Raw-SHA256", hashfile_path],
+            capture_output=True,
+            text=True,
+            timeout=120
+        )
+    except FileNotFoundError as e:
+        print(f"File was not found")
+        return 0
+    except subprocess.TimeoutExpired:
+        print(f"Attack has timed out")
+    except PermissionError:
+        print(f"Permission Denied")
+    else:
+        print(result.stdout)
+        return result
+# function for JTR_Brute():
+"""
+def JTR_Brute():
 # Function for Brute Force attack
     start_time = time.time()
 
@@ -107,9 +138,7 @@ def JTR_dict():
         # dict_result = subprocess.run
     finally:
         return 0 
-
-def JTR_Brute():
-    return 0
+"""
 # Menu function for each option
 def menu():
     while True:
@@ -140,9 +169,20 @@ def menu():
         print("Brute Force Attacks are more in depth and take longer, for this program it will instead be a estimate of how long it would take to crack")
         print("="*40)
         print("type EXIT to leave prompt at any time")
-        JTR = str(input(f"Please enter below which attack you would like done {1} Dictionary Attack {2} Brute Force"))
-        # Rest is either attack function and a exit for the program # do it after
-        
+        # asking user for input
+        JTR = str(input(f"Please enter below which attack you would like done {1} Dictionary Attack {2} Brute Force: "))
+        # create function to check user input for which JTR attack they would like done
+        if JTR == "1":
+            JTR_dict()
+        elif JTR == "2":
+            print("Brute Force not yet implemented")
+            # this will be for the brute force options
+        elif JTR.upper() == "EXIT":
+            print("Exiting program...")
+            break
+        else:
+            print("Please Reenter option, 1 is for dictionary attack 2 for brute force")
+
 if __name__ == "__main__":
     menu()
 
