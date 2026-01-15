@@ -15,7 +15,7 @@ import time
 import string
 # creating function definitions
 # validate_password -> to verify passwords entered making sure they fit the requirements
-# (8-10 characters requiring at least 1 uppercase, 1 lowercase, 1 number)
+# (8-12 characters requiring at least 1 uppercase, 1 lowercase, 1 number)
 def validate_password(password):
     # adding while true function statement in order for the password to fit every requirement even after failing check
     while True:
@@ -27,8 +27,8 @@ def validate_password(password):
         else:
             pass
     # Minimum and maximum length requirements
-        if len(password) > 10:
-            print("The password does not meet the maximum length of 10, please renter the password")
+        if len(password) > 12:
+            print("The password does not meet the maximum length of 12, please renter the password")
             password = str(input("Enter the password: "))
         elif len(password) < 8:
             print("The password does not meet the minimum length requirement of 8, please renter the password.")
@@ -70,9 +70,15 @@ def password_hash(password):
     else:
         # send to hashfile.txt for John the Ripper
         # Could both
-        with open("hashfile.txt","w") as f:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        hashfile_path = os.path.join(script_dir, "hashfile.txt")
+        with open(hashfile_path,"w") as f:
             f.write(hash_sha256 + "\n")
             return hash_sha256
+# Function to check if the password has been cracked or not and print the output for users, this function will go for both attack
+def crackedpassword(john_path, hashfile_path):
+    return 0
+# Note to self, this is the last function needed for the john the ripper
 # Function for the dict attack
 def JTR_dict():
     print("Starting Dictionary Attack with Rules (Enhanced)")
@@ -84,7 +90,7 @@ def JTR_dict():
     john_conf = os.path.join(script_dir, "john", "run", "john.conf")
     # Testing to check the paths work before testing
     if not os.path.exists(hashfile_path):
-        print("Error: hashfile.txt not found!")
+        print("Error: hashfile.txt not found")
         return 0
     
     if not os.path.exists(wordlist_path):
@@ -101,14 +107,10 @@ def JTR_dict():
         os.remove(pot_file)
     
     try:
-        # Using --rules=Wordlist applies common transformations:
-        # - Adding numbers (0-9, 00-99)
-        # - Adding symbols (!@#$%^&*)
-        # - Capitalizing first letter
-        # - l33t speak substitutions
-        # This catches passwords like "Password9!" from base word "password"
+        # update the attack so that passwords outside of rockyyou.txt works
+        # add configuration file
         result = subprocess.run(
-            [john_path, f"--wordlist={wordlist_path}", "--rules=Wordlist", "--format=Raw-SHA256", hashfile_path],
+            [john_path, f"--wordlist={wordlist_path}", "--rules=Wordlist", "--format=Raw-SHA256",f"--config={john_conf}",hashfile_path],
             capture_output=True,
             text=True,
             timeout=120
@@ -121,9 +123,29 @@ def JTR_dict():
     except PermissionError:
         print(f"Permission Denied")
     else:
-        print(result.stdout)
-        return result
+    # use the else statment to print the rest of the prompt
+        print_result = subprocess.run(
+            [john_path, '--show', '--format=Raw-SHA256', hashfile_path],
+            capture_output=True,
+            text=True
+    )
+        # if statement to show is user password is cracked or not
+        # Extract the password from the output to return to users
+        if print_result.stdout and ":" in print_result.stdout:
+            # print statement for user to inform user if their password was cracked
+            output_lines = print_result.stdout.strip().split('\n')
+            for line in output_lines:
+                if ':'in line:
+                    returnpassword = line.split(":",1)[1].strip()
+                    print(f"\nYour password was cracked it being:\n{returnpassword}")
+                    print(f"Thank you for testing the program congratulations")
+            password = print_result.stdout
+            return True, password
+        # else statement if the user's password was not cracked
+        print("Congratulations your password was not cracked/guessed")
+        return False
 # function for JTR_Brute():
+# Leave the function out for now
 """
 def JTR_Brute():
 # Function for Brute Force attack
@@ -155,7 +177,7 @@ def menu():
         usrpassword = str(input("Enter the password below:\n"))
         usrpassword = validate_password(usrpassword)
         # convert to hash file
-        hash_value  = password_hash(usrpassword)
+        # send hash value to function
         print("Your password will be evaluated by testing it against a software tool known as John the Ripper""\n""This tool is used to crack passwords by deploying different attacks")
         print("\n" + "="*40)
         print("1. Dictionary Attack")
@@ -169,19 +191,30 @@ def menu():
         print("Brute Force Attacks are more in depth and take longer, for this program it will instead be a estimate of how long it would take to crack")
         print("="*40)
         print("type EXIT to leave prompt at any time")
+        # creating the hash file for the user
+        password_hash(usrpassword)
         # asking user for input
         JTR = str(input(f"Please enter below which attack you would like done {1} Dictionary Attack {2} Brute Force: "))
         # create function to check user input for which JTR attack they would like done
         if JTR == "1":
-            JTR_dict()
+            result = JTR_dict()
+            # create a loop to check if my result is a tuple or not and return loop based off the score
+            if isinstance(result,tuple):
+                print(f"\nYour password was cracked it being:\n{result[1]}")
+                print(f"Thank you for testing the program congratulations")
+            else:
+                print("Your password has passed the attack ")
+            break
         elif JTR == "2":
             print("Brute Force not yet implemented")
+            print("Brute Force will be implemented at a later date as of now, the only portion that is done is the password guesser")
             # this will be for the brute force options
         elif JTR.upper() == "EXIT":
             print("Exiting program...")
             break
         else:
-            print("Please Reenter option, 1 is for dictionary attack 2 for brute force")
+            break
+        
 
 if __name__ == "__main__":
     menu()
