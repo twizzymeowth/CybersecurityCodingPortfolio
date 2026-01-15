@@ -1,0 +1,7 @@
+# Requirements for the PasswordStrength project
+# Add any packages needed; for a web demo you might add 'flask'
+# flask
+# Requirements for the PasswordStrength project
+# Add packages you want installed in the Codespace environment
+# For a web demo, you might add: flask
+# flask

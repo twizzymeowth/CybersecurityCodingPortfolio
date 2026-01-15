@@ -1,0 +1,32 @@
+{
+  "name": "PasswordStrength Codespace",
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.11",
+  "workspaceFolder": "/workspaces/CybersecurityCodingPortfolio",
+  "postCreateCommand": "pip install -r projects/PasswordStrength/requirements.txt || true",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance"
+      ]
+    }
+  },
+  "forwardPorts": [],
+  "remoteUser": "vscode"
+}
+{
+  "name": "PasswordStrength Codespace",
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.11",
+  "workspaceFolder": "/workspaces/CybersecurityCodingPortfolio",
+  "postCreateCommand": "pip install -r projects/PasswordStrength/requirements.txt || true",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance"
+      ]
+    }
+  },
+  "forwardPorts": [],
+  "remoteUser": "vscode"
+}
