@@ -145,7 +145,6 @@ def JTR_dict():
         print("Congratulations your password was not cracked/guessed")
         return False
 # function for JTR_Brute():
-# Leave the function out for now
 """
 def JTR_Brute():
 # Function for Brute Force attack
